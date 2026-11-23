@@ -37,8 +37,7 @@ Sistema web interno para controlar equipamentos, categorias, locais, técnicos e
 6. Inicie a API: `npm run dev` (http://localhost:3000)
 7. Abra `frontend/login.html` com o Live Server do VS Code
 
-O passo a passo de configuração está em [`docs/SETUP.md`](docs/SETUP.md) e o de deploy (Render, Firebase Hosting, Storage e Postman) em [`docs/DEPLOY.md`](docs/DEPLOY.md).
-Os testes da API estão em `docs/maintenance-system.postman_collection.json` (importe no Postman).
+Os testes da API estão em `docs/maintenance-system.postman_collection.json` (importe no Postman e defina `baseUrl` e `token`).
 
 ## Arquitetura
 Cada requisição segue o caminho **Route → Controller → Service → Prisma → Supabase PostgreSQL**:
@@ -65,7 +64,7 @@ backend/
     middlewares/     autenticação por token, perfis e upload de foto
     database/        conexão do Prisma
 docs/
-  README.md  SETUP.md  DEPLOY.md  maintenance-system.postman_collection.json
+  README.md  maintenance-system.postman_collection.json
 render.yaml          configuração do deploy da API no Render
 firebase.json        configuração do Firebase Hosting
 ```
