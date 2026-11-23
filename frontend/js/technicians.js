@@ -5,7 +5,7 @@ const techniciansUrl = `${API_BASE_URL}/technicians`;
 const technicians = [];
 let editingTechnicianId = null;
 
-// DOM elements
+// Elementos da tela
 const userInfo = document.querySelector("#userInfo");
 const logoutButton = document.querySelector("#logoutButton");
 const techniciansTable = document.querySelector("#techniciansTable");
@@ -19,7 +19,7 @@ const technicianSpecialtyInput = document.querySelector("#technicianSpecialty");
 const technicianModalTitle = document.querySelector("#technicianModalTitle");
 const technicianModal = new bootstrap.Modal(document.querySelector("#technicianModal"));
 
-// Protected page: redirects to the login when there is no authenticated user
+// Página protegida
 requireAuth((user) => {
     userInfo.textContent = `Usuário: ${user.email}`;
     loadTechnicians();

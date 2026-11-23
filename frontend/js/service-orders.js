@@ -5,12 +5,12 @@ const serviceOrdersUrl = `${API_BASE_URL}/service-orders`;
 const serviceOrders = [];
 let editingServiceOrderId = null;
 
-// Texts shown to the user for each value saved in the database
+// Textos exibidos
 const TYPE_LABELS = { corrective: "Corretiva", preventive: "Preventiva" };
 const PRIORITY_LABELS = { low: "Baixa", medium: "Média", high: "Alta" };
 const STATUS_LABELS = { open: "Aberta", in_progress: "Em andamento", completed: "Concluída" };
 
-// DOM elements
+// Elementos da tela
 const userInfo = document.querySelector("#userInfo");
 const logoutButton = document.querySelector("#logoutButton");
 const serviceOrdersTable = document.querySelector("#serviceOrdersTable");
@@ -28,7 +28,7 @@ const orderDescriptionInput = document.querySelector("#orderDescription");
 const serviceOrderModalTitle = document.querySelector("#serviceOrderModalTitle");
 const serviceOrderModal = new bootstrap.Modal(document.querySelector("#serviceOrderModal"));
 
-// Protected page: redirects to the login when there is no authenticated user
+// Página protegida
 requireAuth((user) => {
     userInfo.textContent = `Usuário: ${user.email}`;
     loadEquipmentOptions();
@@ -37,7 +37,7 @@ requireAuth((user) => {
 });
 setupLogout(logoutButton);
 
-// Today's date as YYYY-MM-DD (the format of <input type="date">), using the local time zone
+// Data de hoje
 function getTodayDate() {
     const now = new Date();
     const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -45,12 +45,12 @@ function getTodayDate() {
     return `${now.getFullYear()}-${month}-${day}`;
 }
 
-// The date is saved at midnight UTC, so it is shown in UTC too (otherwise Brazil would show one day before)
+// Data em UTC
 function formatDate(value) {
     return new Date(value).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
-// Fills the equipment <select> of the modal and the one of the history filter
+// Preenche os selects
 async function loadEquipmentOptions() {
     try {
         const response = await apiFetch(`${API_BASE_URL}/equipments`);
@@ -120,7 +120,7 @@ function renderServiceOrdersTable() {
         const actionCell = document.createElement("td");
         actionCell.className = "text-end text-nowrap";
 
-        // "Iniciar" only appears for open orders; "Concluir" until the order is completed
+        // Botões por status
         if (order.status === "open") {
             const startButton = document.createElement("button");
             startButton.type = "button";
@@ -157,7 +157,7 @@ function renderServiceOrdersTable() {
     });
 }
 
-// Loads the orders applying the filters (equipment history and status)
+// Carrega com filtros
 async function loadServiceOrders() {
     const params = new URLSearchParams();
 
@@ -202,7 +202,7 @@ function openEditModal(order) {
     editingServiceOrderId = order.id;
     serviceOrderModalTitle.textContent = "Editar Ordem de Serviço";
     orderEquipmentSelect.value = order.equipmentId;
-    orderEquipmentSelect.disabled = true; // the equipment of an existing order cannot change
+    orderEquipmentSelect.disabled = true; // Equipamento não muda
     orderTechnicianSelect.value = order.technicianId;
     orderTypeSelect.value = order.type;
     orderPrioritySelect.value = order.priority;
@@ -253,7 +253,7 @@ async function saveServiceOrder() {
     }
 }
 
-// PATCH /service-orders/:id/status  (the server also updates the equipment status)
+// Altera o status
 async function changeStatus(order, status) {
     try {
         const response = await apiFetch(`${serviceOrdersUrl}/${order.id}/status`, {
@@ -292,7 +292,7 @@ async function deleteServiceOrder(order) {
 
 newServiceOrderButton.addEventListener("click", openCreateModal);
 saveServiceOrderButton.addEventListener("click", saveServiceOrder);
-// When a filter changes, the list is loaded again with the new filter
+// Recarrega ao filtrar
 filterEquipmentSelect.addEventListener("change", loadServiceOrders);
 filterStatusSelect.addEventListener("change", loadServiceOrders);
 

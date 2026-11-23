@@ -3,7 +3,7 @@ const multer = require("multer");
 const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-// The file stays in memory (req.file.buffer) and is sent to the Supabase Storage by the service.
+// Arquivo em memória
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_SIZE_BYTES },
@@ -15,7 +15,7 @@ const upload = multer({
     }
 }).single("photo");
 
-// Wraps multer to answer with friendly pt-BR messages when the file is not accepted.
+// Mensagens de erro
 function uploadPhoto(req, res, next) {
     upload(req, res, (error) => {
         if (!error) {

@@ -4,7 +4,7 @@ import { signOut, onAuthStateChanged } from
 import { auth } from "./firebase.js";
 import { API_BASE_URL } from "./config.js";
 
-// Same as fetch, but sends the Firebase token so the API knows who is calling.
+// Fetch com token
 export async function apiFetch(url, options = {}) {
     const user = auth.currentUser;
     const token = user ? await user.getIdToken() : null;
@@ -16,8 +16,7 @@ export async function apiFetch(url, options = {}) {
     return fetch(url, { ...options, headers });
 }
 
-// Asks the API for the role (admin or technician). Elements with the class "admin-only"
-// are hidden by the CSS when body[data-role="technician"].
+// Carrega o perfil
 async function loadRole() {
     try {
         const response = await apiFetch(`${API_BASE_URL}/me`);
@@ -31,7 +30,7 @@ async function loadRole() {
     }
 }
 
-// Protected pages: redirect to login when there is no authenticated user.
+// Páginas protegidas
 export function requireAuth(onAuthenticated) {
     onAuthStateChanged(auth, async (user) => {
         if (!user) {

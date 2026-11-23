@@ -1,7 +1,6 @@
 const { firebaseAdminAuth } = require("../firebaseAdmin");
 
-// ADMIN_EMAILS (comma separated) lists the administrators. Everyone else is a "technician".
-// If ADMIN_EMAILS is empty, every authenticated user is an administrator (useful in development).
+// Define o perfil
 function getRole(email) {
     const admins = (process.env.ADMIN_EMAILS || "")
         .split(",")
@@ -14,7 +13,7 @@ function getRole(email) {
     return "technician";
 }
 
-// Reads "Authorization: Bearer <token>", validates it with Firebase and fills req.user.
+// Valida o token
 async function authenticateToken(req, res, next) {
     const header = req.headers.authorization || "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : null;

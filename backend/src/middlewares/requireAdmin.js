@@ -1,4 +1,4 @@
-// Must run after authenticateToken. Only administrators can create, edit or delete.
+// Só administradores
 function requireAdmin(req, res, next) {
     if (req.user && req.user.role === "admin") {
         return next();

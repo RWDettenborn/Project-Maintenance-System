@@ -1,6 +1,6 @@
 const prisma = require("../database/prisma");
 
-// Every equipment is returned together with its category and location.
+// Dados relacionados
 const include = { category: true, location: true };
 
 async function getAllEquipments() {

@@ -3,10 +3,13 @@ import { API_BASE_URL } from "./config.js";
 
 const equipmentsUrl = `${API_BASE_URL}/equipments`;
 const STATUS_LABELS = { active: "Ativo", maintenance: "Em manutenção", inactive: "Inativo" };
+const ORDER_TYPE_LABELS = { corrective: "Corretiva", preventive: "Preventiva" };
+const ORDER_PRIORITY_LABELS = { low: "Baixa", medium: "Média", high: "Alta" };
+const ORDER_STATUS_LABELS = { open: "Aberta", in_progress: "Em andamento", completed: "Concluída" };
 const equipments = [];
 let editingEquipmentId = null;
 
-// DOM elements
+// Elementos da tela
 const userInfo = document.querySelector("#userInfo");
 const logoutButton = document.querySelector("#logoutButton");
 const equipmentsTable = document.querySelector("#equipmentsTable");
@@ -25,8 +28,12 @@ const equipmentPhotoInput = document.querySelector("#equipmentPhoto");
 const equipmentPhotoPreview = document.querySelector("#equipmentPhotoPreview");
 const equipmentModalTitle = document.querySelector("#equipmentModalTitle");
 const equipmentModal = new bootstrap.Modal(document.querySelector("#equipmentModal"));
+const historyModal = new bootstrap.Modal(document.querySelector("#historyModal"));
+const historyModalTitle = document.querySelector("#historyModalTitle");
+const historyTable = document.querySelector("#historyTable");
+const historyEmptyMessage = document.querySelector("#historyEmptyMessage");
 
-// Protected page: redirects to the login when there is no authenticated user
+// Página protegida
 requireAuth((user) => {
     userInfo.textContent = `Usuário: ${user.email}`;
     loadCategories();
@@ -35,7 +42,7 @@ requireAuth((user) => {
 });
 setupLogout(logoutButton);
 
-// The date is stored at midnight UTC, so it is shown in UTC (otherwise Brazil would show the day before).
+// Data em UTC
 function formatDate(value) {
     if (!value) {
         return "-";
@@ -93,13 +100,19 @@ function renderEquipmentsTable(list) {
         editButton.textContent = "Editar";
         editButton.addEventListener("click", () => openEditModal(equipment));
 
+        const historyButton = document.createElement("button");
+        historyButton.type = "button";
+        historyButton.className = "btn btn-outline-secondary btn-sm me-2";
+        historyButton.textContent = "Histórico";
+        historyButton.addEventListener("click", () => openHistoryModal(equipment));
+
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
         deleteButton.className = "btn btn-danger btn-sm admin-only";
         deleteButton.textContent = "Excluir";
         deleteButton.addEventListener("click", () => deleteEquipment(equipment));
 
-        actionCell.append(editButton, deleteButton);
+        actionCell.append(historyButton, editButton, deleteButton);
         row.append(photoCell, nameCell, patrimonyCell, categoryCell, locationCell, acquisitionCell, statusCell, actionCell);
         equipmentsTable.appendChild(row);
     });
@@ -217,7 +230,7 @@ async function saveEquipment() {
             throw new Error(result.message || "Não foi possível salvar o equipamento.");
         }
 
-        // The photo goes in a second request, after the equipment exists (we need its id).
+        // Envia a foto
         let photoError = null;
         if (equipmentPhotoInput.files.length > 0) {
             try {
@@ -241,11 +254,51 @@ async function saveEquipment() {
     }
 }
 
+// Histórico de manutenções
+async function openHistoryModal(equipment) {
+    historyModalTitle.textContent = `Histórico de manutenções - ${equipment.name}`;
+    historyTable.innerHTML = "";
+    historyEmptyMessage.classList.add("d-none");
+
+    try {
+        const response = await apiFetch(`${API_BASE_URL}/service-orders?equipmentId=${equipment.id}`);
+        if (!response.ok) {
+            throw new Error("Não foi possível carregar o histórico.");
+        }
+
+        const orders = await response.json();
+        historyEmptyMessage.classList.toggle("d-none", orders.length > 0);
+
+        orders.forEach((order) => {
+            const row = document.createElement("tr");
+            const values = [
+                formatDate(order.openedAt),
+                ORDER_TYPE_LABELS[order.type] ?? order.type,
+                ORDER_PRIORITY_LABELS[order.priority] ?? order.priority,
+                order.technician?.name ?? "-",
+                order.description,
+                ORDER_STATUS_LABELS[order.status] ?? order.status,
+                formatDate(order.completedAt)
+            ];
+            values.forEach((value) => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+            historyTable.appendChild(row);
+        });
+        historyModal.show();
+    } catch (error) {
+        console.error("Error loading maintenance history:", error);
+        alert(error.message || "Não foi possível carregar o histórico.");
+    }
+}
+
 async function uploadPhoto(equipmentId, file) {
     const formData = new FormData();
     formData.append("photo", file);
 
-    // No "Content-Type" here: the browser sets it (multipart/form-data) for the FormData.
+    // Sem Content-Type
     const response = await apiFetch(`${equipmentsUrl}/${equipmentId}/photo`, {
         method: "POST",
         body: formData
@@ -274,7 +327,7 @@ async function deleteEquipment(equipment) {
     }
 }
 
-// Search: filters the list already loaded (by name or patrimony) without calling the API again
+// Pesquisa local
 function searchEquipments() {
     const term = searchInput.value.trim().toLowerCase();
     const result = equipments.filter((equipment) =>

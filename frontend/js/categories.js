@@ -5,7 +5,7 @@ const categoriesUrl = `${API_BASE_URL}/categories`;
 const categories = [];
 let editingCategoryId = null;
 
-// DOM elements
+// Elementos da tela
 const userInfo = document.querySelector("#userInfo");
 const logoutButton = document.querySelector("#logoutButton");
 const categoriesTable = document.querySelector("#categoriesTable");
@@ -17,7 +17,7 @@ const categoryDescriptionInput = document.querySelector("#categoryDescription");
 const categoryModalTitle = document.querySelector("#categoryModalTitle");
 const categoryModal = new bootstrap.Modal(document.querySelector("#categoryModal"));
 
-// Protected page: redirects to the login when there is no authenticated user
+// Página protegida
 requireAuth((user) => {
     userInfo.textContent = `Usuário: ${user.email}`;
     loadCategories();
@@ -99,7 +99,7 @@ async function saveCategory() {
         return;
     }
 
-    // Same form creates (POST) or edits (PUT): it depends on editingCategoryId
+    // Cria ou edita
     const isEditing = editingCategoryId !== null;
     const url = isEditing ? `${categoriesUrl}/${editingCategoryId}` : categoriesUrl;
 

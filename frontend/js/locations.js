@@ -5,7 +5,7 @@ const locationsUrl = `${API_BASE_URL}/locations`;
 const locations = [];
 let editingLocationId = null;
 
-// DOM elements
+// Elementos da tela
 const userInfo = document.querySelector("#userInfo");
 const logoutButton = document.querySelector("#logoutButton");
 const locationsTable = document.querySelector("#locationsTable");
@@ -23,7 +23,7 @@ const locationStateInput = document.querySelector("#locationState");
 const locationModalTitle = document.querySelector("#locationModalTitle");
 const locationModal = new bootstrap.Modal(document.querySelector("#locationModal"));
 
-// Protected page: redirects to the login when there is no authenticated user
+// Página protegida
 requireAuth((user) => {
     userInfo.textContent = `Usuário: ${user.email}`;
     loadLocations();
@@ -86,9 +86,7 @@ async function loadLocations() {
     }
 }
 
-// ViaCEP (external API): fills the address from the zip code typed by the user.
-// ViaCEP answers in Portuguese: logradouro = street, bairro = neighborhood,
-// localidade = city, uf = state. "erro" is true when the zip code does not exist.
+// Consulta ViaCEP
 async function searchZipCode() {
     const zipCode = locationZipCodeInput.value.replace(/\D/g, "");
 
@@ -213,7 +211,7 @@ async function deleteLocation(location) {
 
 newLocationButton.addEventListener("click", openCreateModal);
 saveLocationButton.addEventListener("click", saveLocation);
-// "blur" happens when the user leaves the zip code field
+// Ao sair do campo
 locationZipCodeInput.addEventListener("blur", searchZipCode);
 
 console.log("Locations page loaded");

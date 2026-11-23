@@ -7,7 +7,7 @@ const equipments = [];
 let editingEquipmentId = null;
 let preventiveCount = 0;
 
-// DOM elements
+// Elementos da tela
 const userInfo = document.querySelector("#userInfo");
 const logoutButton = document.querySelector("#logoutButton");
 const activesTotal = document.querySelector("#activesTotal");
@@ -30,7 +30,7 @@ const equipmentPhotoPreview = document.querySelector("#equipmentPhotoPreview");
 const equipmentModalTitle = document.querySelector("#equipmentModalTitle");
 const equipmentModal = new bootstrap.Modal(document.querySelector("#equipmentModal"));
 
-// Protected page: redirects to the login when there is no authenticated user
+// Página protegida
 requireAuth((user) => {
     userInfo.textContent = `Usuário: ${user.email}`;
     loadCategories();
@@ -40,7 +40,7 @@ requireAuth((user) => {
 });
 setupLogout(logoutButton);
 
-// The three indicators of the dashboard come from the database (through the API)
+// Indicadores do banco
 function updateIndicators() {
     const countByStatus = (status) =>
         equipments.filter((equipment) => equipment.status === status).length;
@@ -50,7 +50,7 @@ function updateIndicators() {
     preventivesTotal.textContent = preventiveCount;
 }
 
-// The date is stored at midnight UTC, so it is shown in UTC (otherwise Brazil would show the day before).
+// Data em UTC
 function formatDate(value) {
     if (!value) {
         return "-";
@@ -138,7 +138,7 @@ async function loadEquipments() {
     }
 }
 
-// Preventive maintenance indicator = preventive service orders that are not completed yet
+// Indicador de preventivas
 async function loadPreventiveCount() {
     try {
         const response = await apiFetch(`${API_BASE_URL}/service-orders`);
@@ -248,7 +248,7 @@ async function saveEquipment() {
             throw new Error(result.message || "Não foi possível salvar o equipamento.");
         }
 
-        // The photo goes in a second request, after the equipment exists (we need its id).
+        // Envia a foto
         let photoError = null;
         if (equipmentPhotoInput.files.length > 0) {
             try {
@@ -276,7 +276,7 @@ async function uploadPhoto(equipmentId, file) {
     const formData = new FormData();
     formData.append("photo", file);
 
-    // No "Content-Type" here: the browser sets it (multipart/form-data) for the FormData.
+    // Sem Content-Type
     const response = await apiFetch(`${equipmentsUrl}/${equipmentId}/photo`, {
         method: "POST",
         body: formData
@@ -305,7 +305,7 @@ async function deleteEquipment(equipment) {
     }
 }
 
-// Search: filters the list already loaded (by name or patrimony) without calling the API again
+// Pesquisa local
 function searchEquipments() {
     const term = searchInput.value.trim().toLowerCase();
     const result = equipments.filter((equipment) =>

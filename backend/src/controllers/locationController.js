@@ -4,7 +4,7 @@ function cleanText(value) {
     return typeof value === "string" ? value.trim() : "";
 }
 
-// Cleans the request body: trims the texts and keeps only the digits of the zip code.
+// Limpa os dados
 function readLocationData(body) {
     return {
         name: cleanText(body.name),
@@ -18,7 +18,7 @@ function readLocationData(body) {
     };
 }
 
-// Returns an error message (shown to the user) or null when the data is valid.
+// Valida os dados
 function validateLocationData(data) {
     if (!data.name) {
         return "Informe o nome do local.";
@@ -109,7 +109,7 @@ async function updateLocation(req, res) {
         const location = await locationService.updateLocation(id, data);
         return res.json(location);
     } catch (error) {
-        // P2025: Prisma code for "record not found"
+        // P2025: não encontrado
         if (error.code === "P2025") {
             return res.status(404).json({ message: "Local não encontrado." });
         }

@@ -4,7 +4,7 @@ const BUCKET = process.env.SUPABASE_BUCKET || "equipment-photos";
 
 let client = null;
 
-// The Supabase client is created only when it is needed (first photo upload).
+// Cliente sob demanda
 function getClient() {
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
         throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not configured");
@@ -15,7 +15,7 @@ function getClient() {
     return client;
 }
 
-// Sends the image to the Supabase Storage bucket and returns its public URL.
+// Envia a foto
 async function uploadEquipmentPhoto(equipmentId, file) {
     const extension = file.mimetype.split("/")[1].replace("jpeg", "jpg");
     const filePath = `equipment-${equipmentId}-${Date.now()}.${extension}`;
@@ -32,7 +32,7 @@ async function uploadEquipmentPhoto(equipmentId, file) {
     return storage.getPublicUrl(filePath).data.publicUrl;
 }
 
-// Removes an old photo from the bucket. It never throws: a failure here must not block the request.
+// Remove a foto
 async function deleteEquipmentPhoto(photoUrl) {
     if (!photoUrl) {
         return;

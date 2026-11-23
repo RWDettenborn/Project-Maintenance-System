@@ -1,12 +1,9 @@
 const prisma = require("../database/prisma");
 
-// Every service order is returned together with its equipment and technician.
+// Dados relacionados
 const include = { equipment: true, technician: true };
 
-// Business rule: the equipment status follows its service orders.
-// - at least one order not completed -> equipment is "maintenance"
-// - no pending order left            -> equipment goes back to "active"
-// "tx" is the transaction client, so everything succeeds or fails together.
+// Regra de negócio
 async function syncEquipmentStatus(tx, equipmentId) {
     const pendingOrders = await tx.serviceOrder.count({
         where: { equipmentId, status: { not: "completed" } }
@@ -20,7 +17,7 @@ async function syncEquipmentStatus(tx, equipmentId) {
         return;
     }
 
-    // Only equipment that was in maintenance returns to active (an inactive one stays inactive).
+    // Inativo continua inativo
     await tx.equipment.updateMany({
         where: { id: equipmentId, status: "maintenance" },
         data: { status: "active" }

@@ -8,7 +8,7 @@ function cleanText(value) {
     return typeof value === "string" ? value.trim() : "";
 }
 
-// Converts a value to a positive integer id, or null when it is not valid.
+// Converte para id
 function toId(value) {
     const number = Number(value);
     return Number.isInteger(number) && number > 0 ? number : null;
@@ -25,8 +25,7 @@ function readServiceOrderData(body) {
     };
 }
 
-// Returns an error message (shown to the user) or null when the data is valid.
-// The equipment is only required when the order is created (it cannot be changed later).
+// Valida os dados
 function validateServiceOrderData(data, isCreation) {
     if (isCreation && !data.equipmentId) {
         return "Selecione o equipamento.";
@@ -52,8 +51,7 @@ function validateServiceOrderData(data, isCreation) {
 async function getAllServiceOrders(req, res) {
     const filters = {};
 
-    // Optional filters: GET /service-orders?equipmentId=1&status=open
-    // Filtering by equipment is what gives each equipment its maintenance history.
+    // Filtros opcionais
     if (req.query.equipmentId) {
         const equipmentId = toId(req.query.equipmentId);
         if (equipmentId === null) {
@@ -112,7 +110,7 @@ async function createServiceOrder(req, res) {
         const order = await serviceOrderService.createServiceOrder(data);
         return res.status(201).json(order);
     } catch (error) {
-        // P2003: foreign key failed (the equipment or the technician does not exist)
+        // P2003: chave estrangeira
         if (error.code === "P2003") {
             return res.status(400).json({ message: "Equipamento ou técnico não encontrado." });
         }
@@ -136,7 +134,7 @@ async function updateServiceOrder(req, res) {
         return res.status(400).json({ message: validationError });
     }
 
-    // The equipment of an existing order cannot be changed.
+    // Equipamento não muda
     delete data.equipmentId;
 
     try {
@@ -154,7 +152,7 @@ async function updateServiceOrder(req, res) {
     }
 }
 
-// PATCH /service-orders/:id/status  ->  body: { "status": "in_progress" }
+// Altera o status
 async function changeServiceOrderStatus(req, res) {
     const id = toId(req.params.id);
 

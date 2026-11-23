@@ -7,7 +7,7 @@ function cleanText(value) {
     return typeof value === "string" ? value.trim() : "";
 }
 
-// Converts "YYYY-MM-DD" to a Date at midnight UTC (null when empty, NaN date when invalid).
+// Converte a data
 function readDate(value) {
     if (!value) {
         return null;
@@ -26,7 +26,7 @@ function readEquipmentData(body) {
     };
 }
 
-// Returns an error message (shown to the user) or null when the data is valid.
+// Valida os dados
 function validateEquipmentData(data) {
     if (!data.name) {
         return "Informe o nome do equipamento.";
@@ -148,7 +148,7 @@ async function deleteEquipment(req, res) {
     try {
         const equipment = await equipmentService.getEquipmentById(id);
         await equipmentService.deleteEquipment(id);
-        // The photo is removed from the Storage only after the equipment was really deleted.
+        // Remove a foto
         if (equipment) {
             await storageService.deleteEquipmentPhoto(equipment.photoUrl);
         }
@@ -157,7 +157,7 @@ async function deleteEquipment(req, res) {
         if (error.code === "P2025") {
             return res.status(404).json({ message: "Equipamento não encontrado." });
         }
-        // P2003: the equipment still has service orders (its maintenance history)
+        // P2003: possui ordens
         if (error.code === "P2003") {
             return res.status(409).json({ message: "Não é possível excluir: o equipamento possui ordens de serviço." });
         }
@@ -166,7 +166,7 @@ async function deleteEquipment(req, res) {
     }
 }
 
-// Receives the photo (field "photo", handled by the uploadPhoto middleware) and saves its URL.
+// Recebe a foto
 async function uploadEquipmentPhoto(req, res) {
     const id = Number(req.params.id);
 

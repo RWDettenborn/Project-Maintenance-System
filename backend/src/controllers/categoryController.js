@@ -11,7 +11,7 @@ function readCategoryData(body) {
     };
 }
 
-// Returns an error message (shown to the user) or null when the data is valid.
+// Valida os dados
 function validateCategoryData(data) {
     if (!data.name) {
         return "Informe o nome da categoria.";

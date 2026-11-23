@@ -5,19 +5,19 @@
     --sidebar-width: 250px;
 }
 
-/* The sidebar fills the screen height only on medium+ screens; on phones it stays compact. */
+/* Sidebar responsiva */
 @media (min-width: 768px) {
     .sidebar {
         min-height: 100vh;
     }
 }
 
-/* Technicians (read-only) do not see the buttons that create, edit or delete. */
+/* Técnico somente leitura */
 body[data-role="technician"] .admin-only {
     display: none !important;
 }
 
-/* Equipment photos (dashboard table and modal preview) */
+/* Fotos dos equipamentos */
 .equipment-photo {
     width: 48px;
     height: 48px;

@@ -12,7 +12,7 @@ const {
 const requireAdmin = require("../middlewares/requireAdmin");
 const uploadPhoto = require("../middlewares/uploadPhoto");
 
-// Everyone logged in can read. Only administrators can change data.
+// Só admin altera
 router.get("/", getAllEquipments);
 router.get("/:id", getEquipmentById);
 router.post("/", requireAdmin, createEquipment);

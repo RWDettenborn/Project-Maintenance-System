@@ -10,7 +10,7 @@ const { authenticateToken } = require("./middlewares/authenticateToken");
 
 const app = express();
 
-// CORS_ORIGIN accepts several addresses separated by comma (see .env.example).
+// Origens permitidas
 const allowedOrigins = process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
     : "*";
@@ -22,8 +22,7 @@ app.get("/", (req, res) => {
     res.json({ message: "Maintenance System API is running." });
 });
 
-// Every route below needs a valid Firebase token (header "Authorization: Bearer <token>").
-// The front-end uses GET /me to know the role of the user (admin or technician).
+// Rotas protegidas
 app.get("/me", authenticateToken, (req, res) => {
     res.json(req.user);
 });

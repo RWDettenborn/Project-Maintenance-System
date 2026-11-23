@@ -10,7 +10,7 @@ const {
 } = require("../controllers/categoryController");
 const requireAdmin = require("../middlewares/requireAdmin");
 
-// Everyone logged in can read. Only administrators can create, edit or delete.
+// Só admin altera
 
 router.get("/", getAllCategories);
 router.get("/:id", getCategoryById);

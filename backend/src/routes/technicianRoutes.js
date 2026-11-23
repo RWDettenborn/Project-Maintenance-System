@@ -10,7 +10,7 @@ const {
 } = require("../controllers/technicianController");
 const requireAdmin = require("../middlewares/requireAdmin");
 
-// Everyone logged in can read. Only administrators can create, edit or delete.
+// Só admin altera
 
 router.get("/", getAllTechnicians);
 router.get("/:id", getTechnicianById);

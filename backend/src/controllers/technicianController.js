@@ -15,7 +15,7 @@ function readTechnicianData(body) {
     };
 }
 
-// Returns an error message (shown to the user) or null when the data is valid.
+// Valida os dados
 function validateTechnicianData(data) {
     if (!data.name) {
         return "Informe o nome do técnico.";
@@ -76,7 +76,7 @@ async function createTechnician(req, res) {
         const technician = await technicianService.createTechnician(data);
         return res.status(201).json(technician);
     } catch (error) {
-        // P2002: Prisma code for "unique constraint failed" (e-mail already used)
+        // P2002: e-mail duplicado
         if (error.code === "P2002") {
             console.warn("Duplicated technician e-mail:", data.email);
             return res.status(409).json({ message: "Já existe um técnico com este e-mail." });
@@ -130,7 +130,7 @@ async function deleteTechnician(req, res) {
         if (error.code === "P2025") {
             return res.status(404).json({ message: "Técnico não encontrado." });
         }
-        // P2003: Prisma code for "foreign key constraint failed" (technician has service orders)
+        // P2003: possui ordens
         if (error.code === "P2003") {
             return res.status(409).json({ message: "Não é possível excluir: o técnico possui ordens de serviço." });
         }
