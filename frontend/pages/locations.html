@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locais - Sistema de Manutenção</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="sidebar col-md-3 col-lg-2 bg-dark text-white p-3">
+                <h4 class="mb-4">Manutenção</h4>
+                <p id="userInfo" class="small text-break"></p>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="./dashboard.html">Dashboard / Equipamentos</a>
+                    <a class="nav-link text-white" href="./categories.html">Categorias</a>
+                    <a class="nav-link text-white active" href="./locations.html">Locais</a>
+                    <a class="nav-link text-white" href="./technicians.html">Técnicos</a>
+                    <a class="nav-link text-white" href="./service-orders.html">Ordens de Serviço</a>
+                </nav>
+                <button id="logoutButton" type="button" class="btn btn-outline-danger mt-3">Sair</button>
+            </aside>
+
+            <main class="col-md-9 col-lg-10 p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                    <h1 class="h3 mb-0">Locais</h1>
+                    <button id="newLocationButton" type="button" class="btn btn-primary admin-only">Novo Local</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle bg-white">
+                        <thead>
+                            <tr>
+                                <th>Local</th>
+                                <th>CEP</th>
+                                <th>Endereço</th>
+                                <th>Cidade/UF</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="locationsTable"></tbody>
+                    </table>
+                </div>
+                <p id="emptyMessage" class="text-muted d-none">Nenhum local cadastrado.</p>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="locationModalTitle">Novo Local</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="locationName" class="form-label">Nome do local</label>
+                        <input id="locationName" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationZipCode" class="form-label">CEP (o endereço é preenchido automaticamente)</label>
+                        <input id="locationZipCode" class="form-control" type="text" placeholder="00000-000" maxlength="9" inputmode="numeric">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationStreet" class="form-label">Rua</label>
+                        <input id="locationStreet" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationNumber" class="form-label">Número</label>
+                        <input id="locationNumber" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationComplement" class="form-label">Complemento</label>
+                        <input id="locationComplement" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationNeighborhood" class="form-label">Bairro</label>
+                        <input id="locationNeighborhood" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationCity" class="form-label">Cidade</label>
+                        <input id="locationCity" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationState" class="form-label">UF</label>
+                        <input id="locationState" class="form-control" type="text" maxlength="2" placeholder="SP">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="saveLocationButton" class="btn btn-success">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted small py-3">
+        <p class="mb-0">2026 Sistema de Controle de Manutenção de Equipamentos - ADS 2026-2</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script type="module" src="../js/locations.js"></script>
+</body>
+</html>

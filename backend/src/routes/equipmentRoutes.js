@@ -3,12 +3,21 @@ const router = express.Router();
 
 const {
     getAllEquipments,
+    getEquipmentById,
     createEquipment,
+    updateEquipment,
+    uploadEquipmentPhoto,
     deleteEquipment
 } = require("../controllers/equipmentController");
+const requireAdmin = require("../middlewares/requireAdmin");
+const uploadPhoto = require("../middlewares/uploadPhoto");
 
+// Everyone logged in can read. Only administrators can change data.
 router.get("/", getAllEquipments);
-router.post("/", createEquipment);
-router.delete("/:id", deleteEquipment);
+router.get("/:id", getEquipmentById);
+router.post("/", requireAdmin, createEquipment);
+router.put("/:id", requireAdmin, updateEquipment);
+router.post("/:id/photo", requireAdmin, uploadPhoto, uploadEquipmentPhoto);
+router.delete("/:id", requireAdmin, deleteEquipment);
 
 module.exports = router;

@@ -1,0 +1,21 @@
+ATUALIZACAO 2 - local/data/foto do equipamento, login na API, perfis e deploy
+
+1) Copie as pastas deste zip por cima do projeto (aceite substituir).
+   Sobrescreve o backend/package.json (novas dependencias: multer e @supabase/supabase-js).
+
+2) ANTES de rodar, leia docs/DEPLOY.md, passos 1 a 3:
+   - criar o bucket publico "equipment-photos" no Supabase Storage
+   - baixar a chave do Firebase Admin e salvar em backend/serviceAccountKey.json
+   - acrescentar no backend/.env: ADMIN_EMAILS, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_BUCKET
+     (veja backend/.env.example)
+   SEM a chave do Firebase Admin a API responde 401 em tudo.
+
+3) No terminal, dentro de backend/:
+   npm install
+   npx prisma migrate deploy
+   npx prisma generate
+   npm run dev
+
+4) Navegador: Ctrl+F5.
+
+5) git add . ; git commit -m "feat: foto, local e data do equipamento, login na API e perfis" ; git push

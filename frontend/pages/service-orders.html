@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordens de Serviço - Sistema de Manutenção</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="sidebar col-md-3 col-lg-2 bg-dark text-white p-3">
+                <h4 class="mb-4">Manutenção</h4>
+                <p id="userInfo" class="small text-break"></p>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="./dashboard.html">Dashboard / Equipamentos</a>
+                    <a class="nav-link text-white" href="./categories.html">Categorias</a>
+                    <a class="nav-link text-white" href="./locations.html">Locais</a>
+                    <a class="nav-link text-white" href="./technicians.html">Técnicos</a>
+                    <a class="nav-link text-white active" href="./service-orders.html">Ordens de Serviço</a>
+                </nav>
+                <button id="logoutButton" type="button" class="btn btn-outline-danger mt-3">Sair</button>
+            </aside>
+
+            <main class="col-md-9 col-lg-10 p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                    <h1 class="h3 mb-0">Ordens de Serviço</h1>
+                    <button id="newServiceOrderButton" type="button" class="btn btn-primary admin-only">Abrir Ordem de Serviço</button>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="filterEquipment" class="form-label small text-muted mb-1">Histórico por equipamento</label>
+                        <select id="filterEquipment" class="form-select">
+                            <option value="">Todos os equipamentos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filterStatus" class="form-label small text-muted mb-1">Status</label>
+                        <select id="filterStatus" class="form-select">
+                            <option value="">Todos os status</option>
+                            <option value="open">Aberta</option>
+                            <option value="in_progress">Em andamento</option>
+                            <option value="completed">Concluída</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle bg-white">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Equipamento</th>
+                                <th>Técnico</th>
+                                <th>Tipo</th>
+                                <th>Prioridade</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Descrição</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serviceOrdersTable"></tbody>
+                    </table>
+                </div>
+                <p id="emptyMessage" class="text-muted d-none">Nenhuma ordem de serviço encontrada.</p>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="serviceOrderModal" tabindex="-1" aria-labelledby="serviceOrderModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="serviceOrderModalTitle">Abrir Ordem de Serviço</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="orderEquipment" class="form-label">Equipamento</label>
+                        <select id="orderEquipment" class="form-select" ><option value="">Selecione</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderTechnician" class="form-label">Técnico</label>
+                        <select id="orderTechnician" class="form-select" ><option value="">Selecione</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderType" class="form-label">Tipo de manutenção</label>
+                        <select id="orderType" class="form-select" ><option value="corrective">Corretiva</option><option value="preventive">Preventiva</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderPriority" class="form-label">Prioridade</label>
+                        <select id="orderPriority" class="form-select" ><option value="low">Baixa</option><option value="medium">Média</option><option value="high">Alta</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderDate" class="form-label">Data</label>
+                        <input id="orderDate" class="form-control" type="date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderDescription" class="form-label">Descrição do serviço</label>
+                        <textarea id="orderDescription" class="form-control" rows="3" ></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="saveServiceOrderButton" class="btn btn-success">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted small py-3">
+        <p class="mb-0">2026 Sistema de Controle de Manutenção de Equipamentos - ADS 2026-2</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script type="module" src="../js/service-orders.js"></script>
+</body>
+</html>

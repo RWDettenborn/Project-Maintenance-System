@@ -1,6 +1,53 @@
 const equipmentService = require("../services/equipmentService");
+const storageService = require("../services/storageService");
 
 const VALID_STATUSES = ["active", "maintenance", "inactive"];
+
+function cleanText(value) {
+    return typeof value === "string" ? value.trim() : "";
+}
+
+// Converts "YYYY-MM-DD" to a Date at midnight UTC (null when empty, NaN date when invalid).
+function readDate(value) {
+    if (!value) {
+        return null;
+    }
+    return new Date(`${value}T00:00:00.000Z`);
+}
+
+function readEquipmentData(body) {
+    return {
+        name: cleanText(body.name),
+        patrimony: cleanText(body.patrimony),
+        status: body.status || "active",
+        categoryId: body.categoryId ? Number(body.categoryId) : null,
+        locationId: body.locationId ? Number(body.locationId) : null,
+        acquisitionDate: readDate(body.acquisitionDate)
+    };
+}
+
+// Returns an error message (shown to the user) or null when the data is valid.
+function validateEquipmentData(data) {
+    if (!data.name) {
+        return "Informe o nome do equipamento.";
+    }
+    if (!data.patrimony) {
+        return "Informe o patrimônio do equipamento.";
+    }
+    if (!VALID_STATUSES.includes(data.status)) {
+        return "Status inválido.";
+    }
+    if (data.categoryId !== null && !Number.isInteger(data.categoryId)) {
+        return "Categoria inválida.";
+    }
+    if (data.locationId !== null && !Number.isInteger(data.locationId)) {
+        return "Local inválido.";
+    }
+    if (data.acquisitionDate !== null && Number.isNaN(data.acquisitionDate.getTime())) {
+        return "Data de aquisição inválida.";
+    }
+    return null;
+}
 
 async function getAllEquipments(req, res) {
     try {
@@ -12,31 +59,82 @@ async function getAllEquipments(req, res) {
     }
 }
 
-async function createEquipment(req, res) {
-    const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
-    const patrimony = typeof req.body.patrimony === "string" ? req.body.patrimony.trim() : "";
-    const status = req.body.status || "active";
+async function getEquipmentById(req, res) {
+    const id = Number(req.params.id);
 
-    if (!name) {
-        return res.status(400).json({ message: "Informe o nome do equipamento." });
-    }
-    if (!patrimony) {
-        return res.status(400).json({ message: "Informe o patrimônio do equipamento." });
-    }
-    if (!VALID_STATUSES.includes(status)) {
-        return res.status(400).json({ message: "Status inválido." });
+    if (!Number.isInteger(id)) {
+        return res.status(400).json({ message: "ID inválido." });
     }
 
     try {
-        const equipment = await equipmentService.createEquipment({ name, patrimony, status });
+        const equipment = await equipmentService.getEquipmentById(id);
+
+        if (!equipment) {
+            return res.status(404).json({ message: "Equipamento não encontrado." });
+        }
+
+        return res.json(equipment);
+    } catch (error) {
+        console.error("Error fetching equipment:", error);
+        return res.status(500).json({ message: "Erro ao buscar equipamento." });
+    }
+}
+
+async function createEquipment(req, res) {
+    const data = readEquipmentData(req.body);
+    const validationError = validateEquipmentData(data);
+
+    if (validationError) {
+        console.warn("Invalid equipment data:", validationError);
+        return res.status(400).json({ message: validationError });
+    }
+
+    try {
+        const equipment = await equipmentService.createEquipment(data);
         return res.status(201).json(equipment);
     } catch (error) {
         if (error.code === "P2002") {
-            console.warn("Duplicated patrimony:", patrimony);
+            console.warn("Duplicated patrimony:", data.patrimony);
             return res.status(409).json({ message: "Já existe um equipamento com este patrimônio." });
+        }
+        if (error.code === "P2003") {
+            return res.status(400).json({ message: "Categoria ou local não encontrado." });
         }
         console.error("Error creating equipment:", error);
         return res.status(500).json({ message: "Erro ao criar equipamento." });
+    }
+}
+
+async function updateEquipment(req, res) {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        return res.status(400).json({ message: "ID inválido." });
+    }
+
+    const data = readEquipmentData(req.body);
+    const validationError = validateEquipmentData(data);
+
+    if (validationError) {
+        console.warn("Invalid equipment data:", validationError);
+        return res.status(400).json({ message: validationError });
+    }
+
+    try {
+        const equipment = await equipmentService.updateEquipment(id, data);
+        return res.json(equipment);
+    } catch (error) {
+        if (error.code === "P2025") {
+            return res.status(404).json({ message: "Equipamento não encontrado." });
+        }
+        if (error.code === "P2002") {
+            return res.status(409).json({ message: "Já existe um equipamento com este patrimônio." });
+        }
+        if (error.code === "P2003") {
+            return res.status(400).json({ message: "Categoria ou local não encontrado." });
+        }
+        console.error("Error updating equipment:", error);
+        return res.status(500).json({ message: "Erro ao atualizar equipamento." });
     }
 }
 
@@ -48,19 +146,59 @@ async function deleteEquipment(req, res) {
     }
 
     try {
+        const equipment = await equipmentService.getEquipmentById(id);
         await equipmentService.deleteEquipment(id);
+        // The photo is removed from the Storage only after the equipment was really deleted.
+        if (equipment) {
+            await storageService.deleteEquipmentPhoto(equipment.photoUrl);
+        }
         return res.status(204).end();
     } catch (error) {
         if (error.code === "P2025") {
             return res.status(404).json({ message: "Equipamento não encontrado." });
+        }
+        // P2003: the equipment still has service orders (its maintenance history)
+        if (error.code === "P2003") {
+            return res.status(409).json({ message: "Não é possível excluir: o equipamento possui ordens de serviço." });
         }
         console.error("Error deleting equipment:", error);
         return res.status(500).json({ message: "Erro ao excluir equipamento." });
     }
 }
 
+// Receives the photo (field "photo", handled by the uploadPhoto middleware) and saves its URL.
+async function uploadEquipmentPhoto(req, res) {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        return res.status(400).json({ message: "ID inválido." });
+    }
+    if (!req.file) {
+        return res.status(400).json({ message: "Selecione uma foto." });
+    }
+
+    try {
+        const equipment = await equipmentService.getEquipmentById(id);
+        if (!equipment) {
+            return res.status(404).json({ message: "Equipamento não encontrado." });
+        }
+
+        const photoUrl = await storageService.uploadEquipmentPhoto(id, req.file);
+        const updated = await equipmentService.updateEquipmentPhoto(id, photoUrl);
+        await storageService.deleteEquipmentPhoto(equipment.photoUrl);
+
+        return res.json(updated);
+    } catch (error) {
+        console.error("Error uploading equipment photo:", error);
+        return res.status(500).json({ message: "Erro ao enviar a foto do equipamento." });
+    }
+}
+
 module.exports = {
     getAllEquipments,
+    getEquipmentById,
     createEquipment,
+    updateEquipment,
+    uploadEquipmentPhoto,
     deleteEquipment
 };

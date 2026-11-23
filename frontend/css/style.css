@@ -4,3 +4,29 @@
     --text-color-ms: #212529;
     --sidebar-width: 250px;
 }
+
+/* The sidebar fills the screen height only on medium+ screens; on phones it stays compact. */
+@media (min-width: 768px) {
+    .sidebar {
+        min-height: 100vh;
+    }
+}
+
+/* Technicians (read-only) do not see the buttons that create, edit or delete. */
+body[data-role="technician"] .admin-only {
+    display: none !important;
+}
+
+/* Equipment photos (dashboard table and modal preview) */
+.equipment-photo {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.equipment-photo-preview {
+    max-width: 100%;
+    max-height: 160px;
+    border-radius: 6px;
+}

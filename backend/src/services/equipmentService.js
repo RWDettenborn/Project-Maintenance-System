@@ -1,27 +1,42 @@
 const prisma = require("../database/prisma");
 
+// Every equipment is returned together with its category and location.
+const include = { category: true, location: true };
+
 async function getAllEquipments() {
     return await prisma.equipment.findMany({
+        include,
         orderBy: { id: "desc" }
     });
 }
 
 async function getEquipmentById(id) {
     return await prisma.equipment.findUnique({
-        where: { id }
+        where: { id },
+        include
     });
 }
 
 async function createEquipment(data) {
     return await prisma.equipment.create({
-        data
+        data,
+        include
     });
 }
 
 async function updateEquipment(id, data) {
     return await prisma.equipment.update({
         where: { id },
-        data
+        data,
+        include
+    });
+}
+
+async function updateEquipmentPhoto(id, photoUrl) {
+    return await prisma.equipment.update({
+        where: { id },
+        data: { photoUrl },
+        include
     });
 }
 
@@ -36,5 +51,6 @@ module.exports = {
     getEquipmentById,
     createEquipment,
     updateEquipment,
+    updateEquipmentPhoto,
     deleteEquipment
 };
