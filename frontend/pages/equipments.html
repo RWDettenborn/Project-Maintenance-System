@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipamentos - Sistema de Manutenção</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="sidebar col-md-3 col-lg-2 bg-dark text-white p-3">
+                <h4 class="mb-4">Manutenção</h4>
+                <p id="userInfo" class="small text-break"></p>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="./dashboard.html">Dashboard</a>
+                    <a class="nav-link text-white active" href="./equipments.html">Equipamentos</a>
+                    <a class="nav-link text-white" href="./categories.html">Categorias</a>
+                    <a class="nav-link text-white" href="./locations.html">Locais</a>
+                    <a class="nav-link text-white" href="./technicians.html">Técnicos</a>
+                    <a class="nav-link text-white" href="./service-orders.html">Ordens de Serviço</a>
+                </nav>
+                <button id="logoutButton" type="button" class="btn btn-outline-danger mt-3">Sair</button>
+            </aside>
+
+            <main class="col-md-9 col-lg-10 p-4">
+                <form class="row g-3 mb-4" onsubmit="return false;">
+                    <div class="col-md-8">
+                        <input id="searchInput" type="text" class="form-control" placeholder="Pesquisar equipamento">
+                    </div>
+                    <div class="col-md-4">
+                        <button id="searchButton" type="button" class="btn btn-primary w-100">Pesquisar</button>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="h3 mb-0">Equipamentos cadastrados</h1>
+                    <button id="newEquipmentButton" type="button" class="btn btn-primary admin-only">Novo Equipamento</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle bg-white">
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Equipamento</th>
+                                <th>Patrimônio</th>
+                                <th>Categoria</th>
+                                <th>Local</th>
+                                <th>Aquisição</th>
+                                <th>Status</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipmentsTable"></tbody>
+                    </table>
+                </div>
+                <p id="emptyMessage" class="text-muted d-none">Nenhum equipamento encontrado.</p>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="equipmentModal" tabindex="-1" aria-labelledby="equipmentModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="equipmentModalTitle">Novo Equipamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="equipmentName" class="form-label">Nome do equipamento</label>
+                        <input id="equipmentName" class="form-control" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label for="equipmentPatrimony" class="form-label">Patrimônio</label>
+                        <input id="equipmentPatrimony" class="form-control" type="text" placeholder="Ex.: PAT-001">
+                    </div>
+                    <div class="mb-3">
+                        <label for="equipmentStatus" class="form-label">Status</label>
+                        <select id="equipmentStatus" class="form-select" ><option value="active">Ativo</option><option value="maintenance">Em manutenção</option><option value="inactive">Inativo</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="equipmentCategory" class="form-label">Categoria</label>
+                        <select id="equipmentCategory" class="form-select" ><option value="">Sem categoria</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="equipmentLocation" class="form-label">Local</label>
+                        <select id="equipmentLocation" class="form-select"><option value="">Sem local</option></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="equipmentAcquisitionDate" class="form-label">Data de aquisição</label>
+                        <input id="equipmentAcquisitionDate" class="form-control" type="date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="equipmentPhoto" class="form-label">Foto (JPG, PNG ou WEBP, até 2 MB)</label>
+                        <input id="equipmentPhoto" class="form-control" type="file" accept="image/jpeg,image/png,image/webp">
+                        <img id="equipmentPhotoPreview" class="equipment-photo-preview mt-2 d-none" alt="Foto do equipamento">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="saveEquipmentButton" class="btn btn-success">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted small py-3">
+        <p class="mb-0">2026 Sistema de Controle de Manutenção de Equipamentos - ADS 2026-2</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script type="module" src="../js/equipments.js"></script>
+</body>
+</html>
